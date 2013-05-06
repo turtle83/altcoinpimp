@@ -79,12 +79,17 @@ class Miner:
     Model representing each individual mining unit
     """
     def __init__(self, config):
-        pass
+        self.config = config
+
+    def get_daily_profit(self, curriencies):
+        for curency in curriencies:
+
 
 
 if "__main__" in __name__ :
     #Load the config
     config = load(open("config.yaml"), Loader=Loader)
+    print config
     curriencies = {}
     for coin in config["coins"]:
         curriencies[coin["symbol"]] = Currency(coin)
