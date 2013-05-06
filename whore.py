@@ -5,7 +5,7 @@ except ImportError:
     from yaml import Loader, Dumper
 from httplib2 import Http
 from datetime import datetime
-
+import json
 
 class Currency:
     def __init__(self, conf):
@@ -57,12 +57,22 @@ class Exchange:
 
     def _convert(self, symbol):
         """
-        Do actual lookup at exchange
+        Choose an exchange, edit symbol if needed...
         """
         if symbol == "BTC":
             return 1.0
         else:
-            pass #TODO
+            if True:
+                return self._convert_btce(symbol)
+            else:
+                pass #Not possible, i know, but later we will put more exchanges
+
+    def _convert_btce(self, symbol):
+        """
+        Do actual lookup at exchange
+        """
+        resp, cont = self.h.request("https://btc-e.com/api/2/%s_btc/ticker" %(symbol.lower()))
+        return float(json.loads(cont)["ticker"]["last"])
 
 class Miner:
     """
@@ -70,7 +80,7 @@ class Miner:
     """
     def __init__(self, config):
         pass
-        
+
 
 if "__main__" in __name__ :
     #Load the config
@@ -79,3 +89,5 @@ if "__main__" in __name__ :
     for coin in config["coins"]:
         curriencies[coin["symbol"]] = Currency(coin)
     print curriencies
+    e = Exchange()
+    print e.convert("LTC")
