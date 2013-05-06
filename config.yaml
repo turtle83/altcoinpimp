@@ -2,20 +2,32 @@
 coins:
     - symbol:   BTC
       name:    Bitcoin
-      confpath:   .bitcoin/bitcoin.conf #Store path to conf or rpc details, dilema...prolly rpc..
+      #confpath:   .bitcoin/bitcoin.conf #Store path to conf or rpc details, dilema...prolly rpc..
       perblock:    25 #How many coins per block?
       algo:    sha256 #scrypt or sha256?
       #configure pools here...
 
     - symbol:   LTC
       name:    Litecoin
-      confpath:   .litecoin/litecoin.conf
+      #confpath:   .litecoin/litecoin.conf
       perblock:    50
+      algo:    scrypt
+
+    - symbol:   CNC
+      name:    ChinaCoin
+      #confpath:   .litecoin/litecoin.conf
+      perblock:    88
+      algo:    scrypt
+
+    - symbol:   FTC
+      name:    FeatherCoin
+      #confpath:   .litecoin/litecoin.conf
+      perblock:    200
       algo:    scrypt
 
     - symbol:   TRC
       name:    Terracoin
-      confpath:   .terracoin/terracoin.conf
+      #confpath:   .terracoin/terracoin.conf
       perblock:    20
       algo:    sha256
 

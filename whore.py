@@ -6,23 +6,45 @@ except ImportError:
 from httplib2 import Http
 from datetime import datetime
 import json
+import operator
+
+h = Http() #Make global
 
 class Currency:
     def __init__(self, conf):
         self.symbol = conf["symbol"]
         self.algo = conf["algo"]
+        self.difficultyapi = {
+            "CNC" : "http://cnc.cryptocoinexplorer.com/chain/CHNCoin/q/getdifficulty",
+            "TRC" : "http://trc.cryptocoinexplorer.com/chain/Terracoin/q/getdifficulty",
+            "LTC" : "http://explorer.litecoin.net/chain/Litecoin/q/nethash/1/-1",
+            "BTC" : "http://blockchain.info/q/getdifficulty",
+            "FTC" : "http://ftc.cryptocoinexplorer.com/chain/Feathercoin/q/getdifficulty"
+        }
+        self.perblock = conf["perblock"]
+
 
     def get_difficulty(self):
         """
         Gets the current difficulty of this currency
         """
-        pass
+        resp, contents = h.request(self.difficultyapi[self.symbol])
+        if len(contents) < 100:
+            #means its not litecoin
+            return float(contents)
+        else:
+            return float(contents.split("\n")[-2].split(",")[4])
 
     def get_coin_per_day_hash(self):
         """
         How many coins can i get per hash?
+        Understanding based on : http://bitcoin.stackexchange.com/a/4566
         """
-        return 1 #DUMMY CALUE
+        difficulty = self.get_difficulty()
+        est_hash_block = difficulty * (2 ** 32) #estimated number of hashes to mine a block
+        blocks_per_hash = 1.0 / est_hash_block #Blocks per hash
+        reward_per_hash = blocks_per_hash * self.perblock #Reward per hash
+        return reward_per_hash * 3600 * 24 # Reward per day going on 1 H/s
 
     def __repr__(self):
         return "Currency <%s>" %(self.symbol)
@@ -36,7 +58,6 @@ class Exchange:
     Cache results for future
     """
     def __init__(self):
-        self.h = Http() #Initialize here to keep conn pool
         self.cache = {} #Cache obj
 
     def convert(self, symbol):
@@ -71,7 +92,7 @@ class Exchange:
         """
         Do actual lookup at exchange
         """
-        resp, cont = self.h.request("https://btc-e.com/api/2/%s_btc/ticker" %(symbol.lower()))
+        resp, cont = h.request("https://btc-e.com/api/2/%s_btc/ticker" %(symbol.lower()))
         return float(json.loads(cont)["ticker"]["last"])
 
 class Miner:
@@ -94,14 +115,24 @@ class Miner:
 
 
 
+def formated_print(name, calculation):
+    sorted_calc = sorted(calculation.iteritems(), key=operator.itemgetter(1))
+    sorted_calc.reverse()
+    btc = calculation["BTC"]
+    print "=============== %s ==============" %(name)
+    for c in sorted_calc:
+        print "%s\t%s BTC/day (%s%%)" %(c[0], c[1], (c[1] * 100/btc))
+    print "================================="
+    
+
 if "__main__" in __name__ :
     #Load the config
     config = load(open("config.yaml"), Loader=Loader)
-    print config
+    #print config
     curriencies = {}
     for coin in config["coins"]:
         curriencies[coin["symbol"]] = Currency(coin)
-    print curriencies
+    #print curriencies
     e = Exchange()
     for miner in config["miners"]:
-        print miner["name"], Miner(miner).get_daily_profit(curriencies, e)
+        formated_print(miner["name"], Miner(miner).get_daily_profit(curriencies, e))
