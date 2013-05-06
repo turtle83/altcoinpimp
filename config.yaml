@@ -3,11 +3,31 @@ coins:
     - symbol:   BTC
       name:    Bitcoin
       confpath:   .bitcoin/bitcoin.conf #Store path to conf or rpc details, dilema...prolly rpc..
+      perblock:    25 #How many coins per block?
+      algo:    sha256 #scrypt or sha256?
+      #configure pools here...
 
     - symbol:   LTC
       name:    Litecoin
       confpath:   .litecoin/litecoin.conf
+      perblock:    50
+      algo:    scrypt
 
     - symbol:   TRC
       name:    Terracoin
       confpath:   .terracoin/terracoin.conf
+      perblock:    20
+      algo:    sha256
+
+miners:
+    - name:    My ATI 7950
+      sha256:    550000000 #Hash/sec
+      scrypt:    650000 #Hash/sec
+      cgminerhost:    192.168.1.100 #Make sure to enable api and allow whore to access
+      cgminerport:    5555
+
+    - name:    Avalon Unit in garage #I dont really have one.. donations welcome
+      sha256:    65000000000
+      scrypt:    0 #Because ASIC.. thats why.
+      cgminerhost:    192.168.1.101
+      cgminerport:    5555
