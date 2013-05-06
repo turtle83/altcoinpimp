@@ -10,7 +10,7 @@ import json
 class Currency:
     def __init__(self, conf):
         self.symbol = conf["symbol"]
-        pass
+        self.algo = conf["algo"]
 
     def get_difficulty(self):
         """
@@ -22,7 +22,7 @@ class Currency:
         """
         How many coins can i get per hash?
         """
-        pass
+        return 1 #DUMMY CALUE
 
     def __repr__(self):
         return "Currency <%s>" %(self.symbol)
@@ -80,9 +80,17 @@ class Miner:
     """
     def __init__(self, config):
         self.config = config
+        self.sha256 = float(config.get("sha256", 0))
+        self.scrypt = float(config.get("scrypt", 0))
 
-    def get_daily_profit(self, curriencies):
-        for curency in curriencies:
+    def get_daily_profit(self, curriencies, exchange):
+        result = {}
+        for symbol in curriencies.keys():
+            #result[symbol] = {}
+            currency = curriencies[symbol]
+            btc_per_hash = currency.get_coin_per_day_hash() * e.convert(symbol)
+            result[symbol] = btc_per_hash * float(self.config.get(currency.algo, 0))
+        return result
 
 
 
@@ -95,4 +103,5 @@ if "__main__" in __name__ :
         curriencies[coin["symbol"]] = Currency(coin)
     print curriencies
     e = Exchange()
-    print e.convert("LTC")
+    for miner in config["miners"]:
+        print miner["name"], Miner(miner).get_daily_profit(curriencies, e)
