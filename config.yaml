@@ -1,0 +1,13 @@
+---
+coins:
+    - symbol:   BTC
+      name:    Bitcoin
+      confpath:   .bitcoin/bitcoin.conf #Store path to conf or rpc details, dilema...prolly rpc..
+
+    - symbol:   LTC
+      name:    Litecoin
+      confpath:   .litecoin/litecoin.conf
+
+    - symbol:   TRC
+      name:    Terracoin
+      confpath:   .terracoin/terracoin.conf
