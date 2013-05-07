@@ -7,6 +7,7 @@ from httplib2 import Http
 from datetime import datetime
 import json
 import operator
+from base64 import b64encode
 
 h = Http() #Make global
 
@@ -14,20 +15,39 @@ class Currency:
     def __init__(self, conf):
         self.symbol = conf["symbol"]
         self.algo = conf["algo"]
-        self.difficultyapi = conf["difficultyapi"]
+        self.difficultyapi = conf.get("difficultyapi")
+        self.rpchost = conf.get("rpchost")
+        self.rpcuser = conf.get("rpcuser")
+        self.rpcpassword = conf.get("rpcpassword")
+        self.rpcport = conf.get("rpcport")
         self.perblock = conf["perblock"]
         self.difficulty = None
         self.difficultyupdated = None
 
     def get_difficulty(self):
-        if self.difficulty is None or (datetime.now() - self.difficultyupdated).total_seconds() > 60:
-            #dont have in cache or cache is > 1 min stale
+        if self.rpchost is not None or self.difficulty is None or (datetime.now() - self.difficultyupdated).total_seconds() > 60:
+            #dont have in cache or cache is > 1 min stale . or we use local daemon
             self.difficulty = self._get_difficulty()
             self.difficultyupdated = datetime.now()
         return self.difficulty
 
-
     def _get_difficulty(self):
+        if self.rpchost is not None:
+            return self._get_difficulty_client()
+        else:
+            return self._get_difficulty_api()
+
+    def _get_difficulty_client(self):
+        """
+        Attempt to get the difficulty from local client (faster)
+        """
+        url = "http://%s:%s/" %(self.rpchost, self.rpcport)
+        headers = { 'Authorization' : 'Basic ' + b64encode("%s:%s" %(self.rpcuser, self.rpcpassword)).decode("ascii")}
+        resp, cont = h.request(url , headers=headers , method="POST", body='{"jsonrpc": "1.0", "id":"curltest", "method": "getdifficulty" }')
+        return float(json.loads(cont)["result"])
+        
+
+    def _get_difficulty_api(self):
         """
         Gets the current difficulty of this currency
         """

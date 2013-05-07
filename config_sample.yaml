@@ -6,6 +6,11 @@ coins:
       perblock:    25 #How many coins per block?
       algo:    sha256 #scrypt or sha256?
       difficultyapi: http://blockchain.info/q/getdifficulty
+      #Next 4 lines optional. if available it will pull difficulty data from local client. more accurate
+      rpchost: 127.0.0.1
+      rpcuser: bitcoinrpc
+      rpcpassword: efwijfeij
+      rpcport: 555
       #configure pools here...
 
     - symbol:   LTC
