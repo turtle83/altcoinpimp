@@ -14,21 +14,24 @@ class Currency:
     def __init__(self, conf):
         self.symbol = conf["symbol"]
         self.algo = conf["algo"]
-        self.difficultyapi = {
-            "CNC" : "http://cnc.cryptocoinexplorer.com/chain/CHNCoin/q/getdifficulty",
-            "TRC" : "http://trc.cryptocoinexplorer.com/chain/Terracoin/q/getdifficulty",
-            "LTC" : "http://explorer.litecoin.net/chain/Litecoin/q/nethash/1/-1",
-            "BTC" : "http://blockchain.info/q/getdifficulty",
-            "FTC" : "http://ftc.cryptocoinexplorer.com/chain/Feathercoin/q/getdifficulty"
-        }
+        self.difficultyapi = conf["difficultyapi"]
         self.perblock = conf["perblock"]
-
+        self.difficulty = None
+        self.difficultyupdated = None
 
     def get_difficulty(self):
+        if self.difficulty is None or (datetime.now() - self.difficultyupdated).total_seconds() > 60:
+            #dont have in cache or cache is > 1 min stale
+            self.difficulty = self._get_difficulty()
+            self.difficultyupdated = datetime.now()
+        return self.difficulty
+
+
+    def _get_difficulty(self):
         """
         Gets the current difficulty of this currency
         """
-        resp, contents = h.request(self.difficultyapi[self.symbol])
+        resp, contents = h.request(self.difficultyapi)
         if len(contents) < 100:
             #means its not litecoin
             return float(contents)
@@ -65,7 +68,7 @@ class Exchange:
         1 of this currency gets me how many BTC?
         """
         cached = self.cache.get(symbol)
-        if cached is None or (datetime.now() - cached["updated"]).total_seconds > 300  :
+        if cached is None or (datetime.now() - cached["updated"]).total_seconds() > 300  :
             #I.e. cache doesnt exist or cache is more than 5 min stale
             result = self._convert(symbol)
             self.cache[symbol] = {

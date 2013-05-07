@@ -5,6 +5,7 @@ coins:
       #confpath:   .bitcoin/bitcoin.conf #Store path to conf or rpc details, dilema...prolly rpc..
       perblock:    25 #How many coins per block?
       algo:    sha256 #scrypt or sha256?
+      difficultyapi: http://blockchain.info/q/getdifficulty
       #configure pools here...
 
     - symbol:   LTC
@@ -12,24 +13,28 @@ coins:
       #confpath:   .litecoin/litecoin.conf
       perblock:    50
       algo:    scrypt
+      difficultyapi: http://explorer.litecoin.net/chain/Litecoin/q/nethash/1/-1
 
     - symbol:   CNC
       name:    ChinaCoin
       #confpath:   .litecoin/litecoin.conf
       perblock:    88
       algo:    scrypt
+      difficultyapi: http://cnc.cryptocoinexplorer.com/chain/CHNCoin/q/getdifficulty
 
     - symbol:   FTC
       name:    FeatherCoin
       #confpath:   .litecoin/litecoin.conf
       perblock:    200
       algo:    scrypt
+      difficultyapi: http://ftc.cryptocoinexplorer.com/chain/Feathercoin/q/getdifficulty
 
     - symbol:   TRC
       name:    Terracoin
       #confpath:   .terracoin/terracoin.conf
       perblock:    20
       algo:    sha256
+      difficultyapi: http://trc.cryptocoinexplorer.com/chain/Terracoin/q/getdifficulty
 
 miners:
     - name:    My ATI 7950
